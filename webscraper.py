@@ -15,17 +15,21 @@ dir_path = os.getcwd() + '/chromedriver'
 
 browser = webdriver.Chrome(executable_path=dir_path, chrome_options=options)
 
-browser.get("https://www.osprey.com/us/en/category/backpacks/")
+browser.get("https://www.osprey.com/us/en/category/technical-packs/backpacking/")
 
-timeout = 20
+timeout = 30
 
 try:
     WebDriverWait(browser, timeout).until(EC.visibility_of_element_located((By.XPATH, "//a[@class='thumb-img pdp-link']")))
-    more_button = browser.find_element_by_xpath("//span[@class='btn btn-lg btn-action']")
 
-    for _ in range(4):
-        more_button.click()
-        time.sleep(2)
+    while True:
+        more_button = browser.find_elements_by_xpath("//span[@class='btn btn-lg btn-action']")
+        if len(more_button) > 0:
+            more_button[0].click()
+            time.sleep(5)
+            continue
+        else:   
+            break
 
     link_elements = browser.find_elements_by_xpath("//a[@class='thumb-img pdp-link']")
     links = [ele.get_attribute('href') for ele in link_elements]
@@ -43,7 +47,7 @@ try:
         final_sizes = '_'.join(sizes)
 
         items.append([name, final_sizes])
-        time.sleep(1)
+        time.sleep(5)
 
     browser.quit()
 
