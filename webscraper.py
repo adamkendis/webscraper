@@ -18,6 +18,7 @@ browser = webdriver.Chrome(executable_path=dir_path, chrome_options=options)
 browser.get("https://www.osprey.com/us/en/category/technical-packs/backpacking/")
 
 timeout = 30
+items = []
 
 try:
     WebDriverWait(browser, timeout).until(EC.visibility_of_element_located((By.XPATH, "//a[@class='thumb-img pdp-link']")))
@@ -33,32 +34,39 @@ try:
 
     link_elements = browser.find_elements_by_xpath("//a[@class='thumb-img pdp-link']")
     links = [ele.get_attribute('href') for ele in link_elements]
+
+    with open('backpack_links.csv', 'w') as data:
+        writer = csv.writer(data)
+        writer.writerows(links)
+    
     print(links)
     time.sleep(4)
 
-    items = []
-    for i in range(len(links)):
-        browser.get(links[i])
-        WebDriverWait(browser, timeout).until(EC.visibility_of_element_located((By.XPATH, "//img[@class='js-radio-bkg-img']")))
-        name = browser.find_element_by_class_name('pdp-desktop-title').text
+    for link in links:
+        browser.get(link)
+        WebDriverWait(browser, timeout).until(EC.visibility_of_element_located((By.XPATH, "//tr[@class='sizedisplay-us us-sizing']")))
+        name = browser.find_element_by_class_name('pdp-desktop-title').text.encode('ascii', 'ignore').decode('utf-8')
         size_info = browser.find_elements_by_xpath("//tr[@class='sizedisplay-us us-sizing']")
         size_text = [_.text for _ in size_info]
-        sizes = ['-'.join([x.split(' ')[0], x.split(' ')[len(x.split(' '))-2]]) for x in size_text]
+        sizes = [u'-'.join([
+            x.split(' ')[0], 
+            x.split(' ')[len(x.split(' '))-2]
+            ]).encode('utf-8').strip() for x in size_text]
         final_sizes = '_'.join(sizes)
-
         items.append([name, final_sizes])
         time.sleep(5)
 
     browser.quit()
 
-    with open('backpacks.csv', 'w') as data:
-        writer = csv.writer(data)
-        writer.writerow(['Name', 'Sizes'])
-        writer.writerows(items)
 
 except TimeoutException:
     print("Timed out")
     browser.quit()
+
+with open('backpacks.csv', 'w') as data:
+    writer = csv.writer(data)
+    writer.writerow(['Name', 'Sizes'])
+    writer.writerows(items)
 
 browser.quit()
 
