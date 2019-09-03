@@ -69,22 +69,3 @@ with open('backpacks.csv', 'w') as data:
     writer.writerows(items)
 
 browser.quit()
-
-# titles_element = browser.find_elements_by_xpath("//tr[@class='sizedisplay-us us-sizing']")
-# titles_name = browser.find_element_by_class_name('pdp-desktop-title')
-# titles = [x.text for x in titles_element]
-# print(titles_name.text)
-# print('titles:')
-# print(titles, '\n')
-# browser.quit()
-
-
-
-# language_element = browser.find_elements_by_xpath("//s[@itemprop='programmingLanguage']")
-# languages = [x.text for x in language_element]
-# print('languages:')
-# print(languages, '\n')
-
-# for title, language in zip(titles, languages):
-#     print("RepoName : Language")
-#     print(title + ": " + language, '\n')
